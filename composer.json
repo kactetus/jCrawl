@@ -1,0 +1,13 @@
+{
+    "name": "jeremyam/jcrawl",
+    "description": "This is a PHP web crawler and scrapper from the command line interface.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "jmenicucci",
+            "email": "labayah@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
