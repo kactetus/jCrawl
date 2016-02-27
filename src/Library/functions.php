@@ -70,6 +70,7 @@ function checkUrl($url)
 
 	return preg_match('%^((https?://)|(www\.))([a-z0-9-].?)+(:[0-9]+)?(/.*)?$%i', $url);
 }
+
 function makeObject($object)
 {
 	$object = json_encode($object);

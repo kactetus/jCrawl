@@ -15,6 +15,14 @@ class Reaver
 		print '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'."\n";
 	}
 
+	public function __destruct()
+	{
+		print 'Stats: '."\n";
+		print '----------------------------------------------------------------'."\n";
+		print 'Crawled....'. count($this->url) . ' Pages'. "\n";
+		print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
+	}
+
 	/**
 	 * Method that implements two functions to
 	 * snag header information from each url.
@@ -33,6 +41,32 @@ class Reaver
 		return fetch($this->url);
 	}
 
+	public function links($site)
+	{
+		$dom = new \DOMDocument('1.0', 'UTF-8');
+		@$dom->loadHTML( '<?xml encoding="UTF-8">' . $site,  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		$dom->normalizeDocument();
+		$dom->formtOutput=true;
+		$dom->encoding = 'UTF-8';
+		$dom->preserveWhiteSpace = false;
+
+		$a = $dom->getElementsByTagName('a');
+		$links = [];
+
+		foreach($a as $link) {
+			$a = url_to_absolute($this->url, $link->getAttribute('href'));
+			$a = rtrim($a, '#');
+			$a = rtrim($a, '/');
+			if(checkUrl($a) && !checkImage($a)) {
+				$links[] = $a;
+			} 
+		}
+
+		var_dump($links);
+
+		return $links;
+	}
+
 	public function init()
 	{	
 		$headers = $this->headers();
@@ -41,6 +75,7 @@ class Reaver
 
 		$result = [
 			'url' => $this->url,
+			'links' => $this->links($response['html']),
 			'rank' => $rank->getRank($this->url),
 			'headers' => $headers, 
 			'site' => $response
@@ -55,6 +90,6 @@ class Reaver
 
 	public function crawl()
 	{
-		var_dump($this->init());
+		return $this->init();
 	}
 }
