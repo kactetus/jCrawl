@@ -32,7 +32,7 @@ class Reaver
 	{
 		return [ 
 			'code' => (int) get_http_response_code($this->url),
-			'headers' => get_http_headers($this->url)
+			'status' => get_http_headers($this->url)
 		];
 	}
 
