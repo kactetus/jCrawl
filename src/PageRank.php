@@ -1,14 +1,14 @@
 <?php namespace Crawler;
 
 
-class PR {
+class Rank {
 
 	public function __construct()
 	{
 		error_reporting(E_ALL & ~E_NOTICE);
 	}
 
-	public function get_google_pagerank($url) 
+	public function getRank($url) 
 	{
 		$query="http://toolbarqueries.google.com/tbr?client=navclient-auto&ch=".$this->CheckHash($this->HashURL($url)). "&features=Rank&q=info:".$url."&num=100&filter=0";
 		@$data=file_get_contents($query);

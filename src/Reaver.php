@@ -1,5 +1,7 @@
 <?php namespace Crawler;
 
+use Crawler\Rank;
+
 class Reaver 
 {
 
@@ -35,9 +37,11 @@ class Reaver
 	{	
 		$headers = $this->headers();
 		$response = $this->get();
+		$rank = new Rank;
 
 		$result = [
 			'url' => $this->url,
+			'rank' => $rank->getRank($this->url),
 			'headers' => $headers, 
 			'site' => $response
 		];
