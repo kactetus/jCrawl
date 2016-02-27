@@ -3,7 +3,7 @@
 class Reaver 
 {
 
-	public $url = 'http://golectures.com';
+	public $url = 'http://www.mianm.com';
 
 	public function __construct()
 	{
@@ -31,11 +31,26 @@ class Reaver
 		return fetch($this->url);
 	}
 
+	public function init()
+	{	
+		$headers = $this->headers();
+		$response = $this->get();
+
+		$result = [
+			'url' => $this->url,
+			'headers' => $headers, 
+			'site' => $response
+		];
+
+		$result = json_encode($result);
+
+		file_put_contents('response.json', indent($result));//, FILE_APPEND | LOCK_EX);
+
+		return indent($result);
+	}
+
 	public function crawl()
 	{
-		$headers = $this->headers();
-		$site = $this->get();
-		var_dump($headers);
-		var_dump($site);
+		var_dump($this->init());
 	}
 }
