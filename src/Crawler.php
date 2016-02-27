@@ -5,7 +5,7 @@ use Carbon\Carbon;
 use MongoClient;
 use Crawler\PR;
 
-class Reaver {
+class Crawler {
 
 	/**
 	 * Starting URL, arrays of URLs already indexed
