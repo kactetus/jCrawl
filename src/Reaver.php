@@ -57,7 +57,7 @@ class Reaver
 			$a = url_to_absolute($this->url, $link->getAttribute('href'));
 			$a = rtrim($a, '#');
 			$a = rtrim($a, '/');
-			if(checkUrl($a) && !checkImage($a)) {
+			if(checkUrl($a) && !checkImage($a) && $a !== $this->url) {
 				$links[] = $a;
 			} 
 		}
