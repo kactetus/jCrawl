@@ -97,9 +97,7 @@ class Reaver
 	 * The backbone of the crawler, gather's the headers
 	 * and grabs the HTML content of a site as well
 	 * as the information about the fetch.
-	 * @return [JSON] [displays the results in json format as well
-	 * as writes the content to a json file. Content is set to override whatever
-	 * was there previously]
+	 * @return [JSON] [displays the results in json format]
 	 */
 	public function init()
 	{	
@@ -132,8 +130,6 @@ class Reaver
 
 		$result = json_encode($result);
 
-		file_put_contents('response.json', indent($result));//, FILE_APPEND | LOCK_EX);
-
 		return indent($result);
 	}
 
@@ -158,6 +154,6 @@ class Reaver
 
 		$this->url = trim($uri[1], '#');
 
-		return $this->init();
+		$this->init();
 	}
 }
