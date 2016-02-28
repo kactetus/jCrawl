@@ -113,9 +113,9 @@ class Reaver
 
 			$headers = $this->headers();
 			$response = $this->get();
-
-			print '['.$headers['status'][0].'] '.$this->url."\n";
 		}
+
+		print '['.$headers['status'][0].'] '.$this->url."\n";
 
 		$rank = new Rank;
 
