@@ -33,6 +33,7 @@ class Reaver
 			print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
 			exit;
 		}
+
 		print 'Stats: '."\n";
 		print '----------------------------------------------------------------'."\n";
 		print 'Crawled....'. count($this->url) . ' Pages'. "\n";
@@ -128,11 +129,13 @@ class Reaver
 	 */
 	public function crawl($uri)
 	{
+		// Check for too many arguments
 		if(count($uri) > 2) {
 			$this->error = 'Too many arguments';
 			return dd('Too many arguments');
 		}
 
+		// Check if a valid url has been input
 		if(!checkUrl($uri[1])) {
 			$this->error = 'Please use the correct html format'."\n".'Example: http://www.example.com';
 			return dd('Please use the correct html format'."\n".'Example: http://www.example.com');
