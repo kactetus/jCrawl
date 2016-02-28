@@ -1,3 +1,4 @@
 /vendor/
 storage/errors/*
 storage/logs/*
+response.json
