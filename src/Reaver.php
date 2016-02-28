@@ -62,8 +62,6 @@ class Reaver
 			} 
 		}
 
-		var_dump($links);
-
 		return $links;
 	}
 
