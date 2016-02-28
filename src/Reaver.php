@@ -5,7 +5,7 @@ use Crawler\Rank;
 class Reaver 
 {
 
-	public $url = 'http://www.mianm.com';
+	public $url;
 
 	public function __construct()
 	{
@@ -88,8 +88,12 @@ class Reaver
 		return indent($result);
 	}
 
-	public function crawl()
+	public function crawl($uri)
 	{
+		if(count($uri) > 2)
+			die('Too many arguments');
+
+		$this->url = $uri[1];
 		return $this->init();
 	}
 }
