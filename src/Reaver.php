@@ -16,7 +16,7 @@ class Reaver
 	 */
 	public function __construct()
 	{
-		set_time_limit(1000); 
+		set_time_limit(500); 
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
 		//error_reporting(E_ALL & ~E_NOTICE);
 		print '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'."\n";
