@@ -83,14 +83,14 @@ class Reaver
 
 		foreach($a as $link) {
 			$a = url_to_absolute($this->url, $link->getAttribute('href'));
+
 			$a = rtrim($a, '#');
 			$a = rtrim($a, '/');
-			if(checkUrl($a) && !checkImage($a) && $a !== $this->url) {
-				$links[] = $a;
-			} 
+
+			if(checkUrl($a) && !checkImage($a)) $links[] = $a; 
 		}
 
-		return $links;
+		return array_unique($links);
 	}
 
 	/**
@@ -125,7 +125,7 @@ class Reaver
 		$result = [
 			'url' => $this->url,
 			'links' => $this->links($response['html']),
-			'rank' => $rank->getRank($this->url),
+			'rank' => (int) $rank->getRank($this->url),
 			'headers' => $headers, 
 			'site' => $response
 		];
@@ -156,7 +156,7 @@ class Reaver
 			return dd('Please use the correct html format'."\n".'Example: http://www.example.com');
 		}
 
-		$this->url = $uri[1];
+		$this->url = trim($uri[1], '#');
 
 		return $this->init();
 	}
