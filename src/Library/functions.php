@@ -402,3 +402,11 @@ function indent($json) {
 
     return $result;
 }
+
+function dd($string = '') {
+    
+    if($string !== '')
+        die(var_dump($string));
+
+    exit();
+}
