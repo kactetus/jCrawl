@@ -7,6 +7,8 @@ class Reaver
 
 	public $url;
 	public $error;
+	public $links = [];
+	public $followed = [];
 
 	/**
 	 * Setting up the crawler and displaying some nice
@@ -38,6 +40,23 @@ class Reaver
 		print '----------------------------------------------------------------'."\n";
 		print 'Crawled....'. count($this->url) . ' Pages'. "\n";
 		print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
+	}
+
+	public function setUrl($uri)
+	{
+		// Check for too many arguments
+		if(count($uri) > 2) {
+			$this->error = 'Too many arguments';
+			return dd('Too many arguments');
+		}
+
+		// Check if a valid url has been input
+		if(!checkUrl($uri[1])) {
+			$this->error = 'Please use the correct html format'."\n".'Example: http://www.example.com';
+			return dd('Please use the correct html format'."\n".'Example: http://www.example.com');
+		}
+
+		$this->url = trim($uri[1], '#');
 	}
 
 	/**
@@ -79,7 +98,6 @@ class Reaver
 		$dom->preserveWhiteSpace = false;
 
 		$a = $dom->getElementsByTagName('a');
-		$links = [];
 
 		foreach($a as $link) {
 			$a = url_to_absolute($this->url, $link->getAttribute('href'));
@@ -87,10 +105,13 @@ class Reaver
 			$a = rtrim($a, '#');
 			$a = rtrim($a, '/');
 
-			if(checkUrl($a) && !checkImage($a)) $links[] = $a; 
+			// Load the links
+			if(checkUrl($a) && !checkImage($a)) $this->links[] = $a; 
 		}
 
-		return array_unique($links);
+		$this->links = array_unique($this->links);
+
+		return $this->links;
 	}
 
 	/**
@@ -130,7 +151,27 @@ class Reaver
 
 		$result = json_encode($result);
 
+		file_put_contents('response.json', indent($result));
+
+		$this->followed[] = $this->url;
+
 		return indent($result);
+	}
+
+	public function follow()
+	{
+		array_shift($this->links);
+		array_pop($this->links);
+
+		foreach($this->links as $link) {
+			if(in_array($link, $this->followed)) {
+				unset($this->links[$link]);
+				continue;
+			}
+
+			$this->setUrl([0, $link]);
+			$this->crawl();
+		}
 	}
 
 	/**
@@ -138,22 +179,9 @@ class Reaver
 	 * @param  [string] $uri [Takes the string url entered from the cli]
 	 * @return [method]      [Starts the init on the crawler to actually fetch the site.]
 	 */
-	public function crawl($uri)
+	public function crawl()
 	{
-		// Check for too many arguments
-		if(count($uri) > 2) {
-			$this->error = 'Too many arguments';
-			return dd('Too many arguments');
-		}
-
-		// Check if a valid url has been input
-		if(!checkUrl($uri[1])) {
-			$this->error = 'Please use the correct html format'."\n".'Example: http://www.example.com';
-			return dd('Please use the correct html format'."\n".'Example: http://www.example.com');
-		}
-
-		$this->url = trim($uri[1], '#');
-
 		$this->init();
+		$this->follow();
 	}
 }

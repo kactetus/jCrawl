@@ -9,5 +9,6 @@ $crawler = new Crawler\Reaver;
 /**
  * Let's get his party started.
  */
-$crawler->crawl($argv);
+$crawler->setUrl($argv);
 
+$crawler->crawl();
