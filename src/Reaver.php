@@ -105,6 +105,18 @@ class Reaver
 	{	
 		$headers = $this->headers();
 		$response = $this->get();
+
+		if($headers['code'] === 301) {
+			print '['.$headers['status'][0].'] '.$this->url. "\n" .'Redirecting...'. "\n";
+
+			$this->url = $response['info']['redirect_url'];
+
+			$headers = $this->headers();
+			$response = $this->get();
+
+			print '['.$headers['status'][0].'] '.$this->url."\n";
+		}
+
 		$rank = new Rank;
 
 		$result = [
