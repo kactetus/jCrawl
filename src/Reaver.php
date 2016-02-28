@@ -34,7 +34,7 @@ class Reaver
 			exit;
 		}
 
-		print 'Stats: '."\n";
+		print "\n\n".'Stats: '."\n";
 		print '----------------------------------------------------------------'."\n";
 		print 'Crawled....'. count($this->url) . ' Pages'. "\n";
 		print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
