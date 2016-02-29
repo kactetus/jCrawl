@@ -134,6 +134,16 @@ class Reaver
 
 			$headers = $this->headers();
 			$response = $this->get();
+
+			if($headers['code'] === 301) {
+
+				print '['.$headers['status'][0].'] '.$this->url. "\n" .'Redirecting...'. "\n";
+
+				$this->url = $response['info']['redirect_url'];
+
+				$headers = $this->headers();
+				$response = $this->get();
+			}
 		}
 
 		// Outputting urls that have been crawled to the screen
@@ -151,7 +161,7 @@ class Reaver
 
 		$result = json_encode($result);
 
-		file_put_contents('response.json', indent($result));
+		//file_put_contents('response.json', indent($result));
 
 		$this->followed[] = $this->url;
 
