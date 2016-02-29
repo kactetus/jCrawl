@@ -176,6 +176,6 @@ class Reaver
 	public function crawl()
 	{
 		$this->init();
-		//$this->follow();
+		$this->follow();
 	}
 }
