@@ -410,3 +410,18 @@ function dd($string = '') {
 
     exit();
 }
+
+
+function signal_handler($signal) {
+    switch($signal) {
+        case SIGTERM:
+            print "Caught SIGTERM\n";
+            exit;
+        case SIGKILL:
+            print "Caught SIGKILL\n";
+            exit;
+        case SIGINT:
+            print "\nShutting Down Reaver...\n";
+            exit;
+    }
+}

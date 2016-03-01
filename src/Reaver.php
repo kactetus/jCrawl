@@ -22,6 +22,9 @@ class Reaver
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
 		//error_reporting(E_ALL & ~E_NOTICE);
 		print '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'."\n";
+
+		declare(ticks = 1);
+
 	}
 
 	/**
@@ -128,10 +131,10 @@ class Reaver
 		// Check to see if the url is a permanent redirect
 		// If so, reset the seed url with the redirect url.
 		if($headers['code'] === 301) 
-			print '['.$headers['status'][0].'] '.$this->url. "\n" .' >> '. $response['info']['redirect_url']. "\n";
+			print '['.$headers['status'][0].'] '.$this->url. "\n" .' >> '. $response['info']['redirect_url']. "...............(" . $response['info']['total_time']." seconds) \n";
 		else
 			// Outputting urls that have been crawled to the screen
-			print '['.$headers['status'][0].'] '.$this->url. " (" . $response['info']['total_time']." seconds) \n";
+			print '['.$headers['status'][0].'] '.$this->url. "...............(" . $response['info']['total_time']." seconds) \n";
 
 		$rank = new Rank;
 
@@ -175,7 +178,13 @@ class Reaver
 	 */
 	public function crawl()
 	{
-		$this->init();
-		$this->follow();
+		pcntl_signal(SIGTERM, "signal_handler");
+	    pcntl_signal(SIGINT, "signal_handler");
+
+	    while(1) {
+	        $this->init();
+			$this->follow();
+	    }
+		
 	}
 }
