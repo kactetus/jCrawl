@@ -130,12 +130,16 @@ class Reaver
 
 		// Check to see if the url is a permanent redirect
 		// If so, reset the seed url with the redirect url.
-		if($headers['code'] === 301) 
+		if($headers['code'] === 301) {
 
 			print '['.$headers['status'][0].'] '.$this->url. "\n" .' >> '. $response['info']['redirect_url']. ".....................(" . $response['info']['total_time']." seconds) \n";
-		else
+
+			$this->url = $response['info']['redirect_url'];
+
+		} else {
 			// Outputting urls that have been crawled to the screen
 			print '['.$headers['status'][0].'] '.$this->url. ".....................(" . $response['info']['total_time']." seconds) \n";
+		}
 
 
 		$rank = new Rank;
