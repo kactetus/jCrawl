@@ -1,7 +1,7 @@
 # jCrawl
 PHP WebCrawler and Scrapper Library
 
-# Installation
+## Installation
 
 ```
 composer require jeremyam/jcrawler
