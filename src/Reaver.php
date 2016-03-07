@@ -83,17 +83,8 @@ class Reaver
 		$response 	= $this->response;
 		$links 		= $this->links();
 
-		if($headers['code'] == 301) {
-			 foreach($headers['status'] as $location) {
-			 	if(preg_match("!Location: (.*)!", $location, $matches)) 
-        			$this->url = $matches[1];
-        			echo "[".$headers->status[0] ."] >> " . $this->url ." >> (".$response['total_time']. ") \n";
-        			break;
-			 }
-		}
-
-		echo "[".$headers->status[0] ."] >> " . $this->url ." >> (".$response['total_time']. ") \n";
-
+		echo "[".$headers->status[0] ."] >> " . $this->url ." >> (".$response['total_time']. ") \n";	
+		
 		$result = [
 			'headers' => $headers,
 			'result' => $response,
