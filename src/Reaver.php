@@ -44,6 +44,8 @@ class Reaver
 			curl_getinfo($this->ch)
 		];
 
+		curl_close($this->ch);
+
 		var_dump($response);
 	}
 
