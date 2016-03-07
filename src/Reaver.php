@@ -163,9 +163,6 @@ class Reaver
 
 	public function follow()
 	{
-		array_shift($this->links);
-		array_pop($this->links);
-
 		foreach($this->links as $link) {
 			if(in_array($link, $this->followed)) {
 				unset($this->links[$link]);
