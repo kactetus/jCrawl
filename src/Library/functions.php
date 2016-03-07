@@ -422,12 +422,13 @@ function indent($json) {
     return $result;
 }
 
-function dd($string = '') {
-    
-    if($string !== '')
-        die(var_dump($string));
+if(!function_exists('dd')) {
+    function dd($string = '') {
+        if($string !== '')
+            die(var_dump($string));
 
-    exit();
+        exit();
+    }
 }
 
 
