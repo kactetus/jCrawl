@@ -39,14 +39,16 @@ class Reaver
 
 	public function crawl()
 	{
+
+		echo "\n".$this->url ."\n";
 		$response =  [
 			$this->fetch(),
 			curl_getinfo($this->ch)
 		];
 
-		curl_close($this->ch);
+		$response = json_encode($response);
 
-		var_dump($response);
+		var_dump(indent($response));
 	}
 
 }
