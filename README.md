@@ -10,7 +10,7 @@ Current versions of jCrawl do not adhere to follow or nofollow directives, but t
 ## Installation
 
 ```
-composer require jeremyam/jcrawler
+composer require jeremyam/jcrawl
 ```
 
 ## Usage
