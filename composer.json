@@ -15,9 +15,6 @@
     "autoload": {
         "psr-4": {
             "Crawler\\": "src/"
-        },
-        "files": [
-            "src/Library/functions.php"
-        ]
+        }
     }
 }
