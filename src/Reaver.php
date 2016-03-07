@@ -20,10 +20,11 @@ class Reaver
 
 		$this->ch = curl_init();
 	    curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
-	    curl_setopt($this->ch, CURLOPT_HEADER, 0);
+	    curl_setopt($this->ch, CURLOPT_HEADER, true);
 	    curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->agent);
 	    curl_setopt($this->ch, CURLOPT_TIMEOUT, 60);
 	    curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true); 
+	    curl_setopt($this->ch, CURLOPT_AUTOREFERER, true); 
 	}
 
 	public function __destruct()
