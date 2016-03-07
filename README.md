@@ -8,9 +8,14 @@ Current versions of jCrawl do not adhere to follow or nofollow directives, but t
 
 
 ## Installation
+Update your composer.json file to include the following require
 
 ```
-composer require jeremyam/jcrawl
+{
+	"require": {
+		"jeremyam/jcrawl": "0.2.x-dev"
+	}
+}
 ```
 
 ## Usage
