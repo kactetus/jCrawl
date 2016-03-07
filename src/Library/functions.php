@@ -422,15 +422,6 @@ function indent($json) {
     return $result;
 }
 
-if(!function_exists('dd')) {
-    function dd($string = '') {
-        if($string !== '')
-            die(var_dump($string));
-
-        exit();
-    }
-}
-
 
 function signal_handler($signal) {
     switch($signal) {
