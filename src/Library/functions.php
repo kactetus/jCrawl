@@ -13,6 +13,21 @@ function truncate($string, $length=100, $append="&hellip;")
 	return $string;
 }
 
+function json($array, $object = false)
+{
+    
+    if($object === true) {
+        $array = json_decode(json_encode($array), false);
+        return $array;
+    } 
+    
+
+    $array = json_encode($array);
+    $array = indent($array);
+
+    return $array;
+}
+
 
 function shorturl($url){
     $length = STRLEN($url);
