@@ -138,7 +138,7 @@ class Reaver
 
 		} else {
 			// Outputting urls that have been crawled to the screen
-			print '['.$headers['status'][0].'] '.$this->url. ".....................(" . $response['info']['total_time']." seconds) \n";
+			print '['.$headers['status'][0].'] "'.$this->url. "\".....................(" . $response['info']['total_time']." seconds) \n";
 		}
 
 
