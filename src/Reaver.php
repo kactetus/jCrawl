@@ -83,7 +83,7 @@ class Reaver
 		$response 	= $this->response;
 		$links 		= $this->links();
 
-		echo "[".$headers->status[0] ."] >> " . $this->url ."\n";
+		echo "[".$headers->status[0] ."] >> " . $this->url ." >> (".$response['total_time']. ") \n";
 
 		$result = [
 			'headers' => $headers,
