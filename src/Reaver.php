@@ -48,7 +48,7 @@ class Reaver
 
 		$response = json_encode($response);
 
-		var_dump(indent($response));
+		return indent($response);
 	}
 
 }
