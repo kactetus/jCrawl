@@ -96,6 +96,8 @@ class Reaver
 		$result = json($result);
 
 		$this->followed[] = $this->url;
+
+		return $result;
 	}
 
 	public function follow()
