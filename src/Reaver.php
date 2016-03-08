@@ -37,7 +37,7 @@ class Reaver
 
 	public function setUrl($url)
 	{
-		$this->url = $url[1];
+		$this->url = is_array($url) ? $url[1] : $url;
 	    curl_setopt($this->ch, CURLOPT_URL, $this->url);
 	    $this->response = curl_getinfo($this->ch);
 	}
