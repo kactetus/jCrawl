@@ -1,6 +1,8 @@
 <?php namespace Crawler;
 
-class Reaver 
+use Crawler\Rank;
+
+class Reaver extends Rank
 {
 	public $url;
 	public $followed;
@@ -97,7 +99,8 @@ class Reaver
 			'headers' => $headers,
 			'result' => $response,
 			'html' => $this->fetch(),
-			'links' => $links
+			'links' => $links,
+			'rank' => $this->getRank($this->url)
 		];		
 
 		$result = json($result);
