@@ -2,9 +2,8 @@
 
 use Crawler\Rank;
 
-class Reaver extends Rank 
+class Reaver extends Rank
 {
-
 	public $url;
 	public $followed;
 	public $links;
@@ -13,24 +12,36 @@ class Reaver extends Rank
 	         "Accept-Language: en-us"
     ];
 
-    public function __construct()
+    public $ch;
+    public $response;
+
+	public function __construct()
 	{
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
 		print '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'."\n";
+
+		/*$this->ch = curl_init();
+	    curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
+	    curl_setopt($this->ch, CURLOPT_HEADER, true);
+	    curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->agent);
+	    curl_setopt($this->ch, CURLOPT_TIMEOUT, 60);
+	    curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true); 
+	    curl_setopt($this->ch, CURLOPT_AUTOREFERER, true); */
 	}
 
 	public function __destruct()
 	{
 		print "\n\n".'Stats: '."\n";
 		print '----------------------------------------------------------------'."\n";
-		print 'Crawled.... '. number_format(count($this->followed)) . ' Pages'. "\n";
-		print 'Found.... '. number_format(count($this->links)) . ' Links'. "\n";
+		print 'Crawled....'. count($this->url) . ' Pages'. "\n";
 		print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
 	}
 
 	public function setUrl($url)
 	{
 		$this->url = is_array($url) ? $url[1] : $url;
+	    /*curl_setopt($this->ch, CURLOPT_URL, $this->url);
+	    $this->response = curl_getinfo($this->ch);*/
 	}
 
 	public function headers()
@@ -49,11 +60,7 @@ class Reaver extends Rank
 
 	public function fetch()
 	{
-		$ch = curl_init($this->url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->agent); 
-		return curl_exec($ch);
+		return curl_exec($this->ch);
 	}
 
 	public function links()
@@ -73,25 +80,36 @@ class Reaver extends Rank
 		return $this->links;
 	}
 
+
+	/**
+	 * The backbone of the crawler, gather's the headers
+	 * and grabs the HTML content of a site as well
+	 * as the information about the fetch.
+	 * @return [JSON] [displays the results in json format]
+	 */
+
 	public function init()
 	{
 		$headers 	= $this->headers();
+		$response 	= $this->response;
 		$links 		= $this->links();
 
-		echo "[".$headers->status[0] ."] >> " . $this->url ." >> (0) \n";	
+		echo "[".$headers->status[0] ."] >> " . $this->url ." >> (".$response['total_time']. ") \n";	
 		
 		$result = [
 			'headers' => $headers,
+			'result' => $response,
 			'html' => $this->fetch(),
+			'links' => $links,
+			'rank' => $this->getRank($this->url)
 		];		
 
 		$result = json($result);
 
 		$this->followed[] = $this->url;
 
-		var_dump($result);
+		return $result;
 	}
-
 
 	public function follow()
 	{
@@ -108,7 +126,7 @@ class Reaver extends Rank
 	public function crawl()
 	{
 		$this->init();
-		//$this->follow();
+		$this->follow();
 	}
 
 }
