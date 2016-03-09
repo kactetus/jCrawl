@@ -35,7 +35,7 @@ function shorturl($url){
         $length = $length - 30;
         $first = SUBSTR($url, 0, -$length);
         $last = SUBSTR($url, -15);
-        $new = $first."[ ... ]".$last;
+        $new = $first."/.../".$last;
         return $new;
     }else{
         return $url;
