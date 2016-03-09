@@ -31,16 +31,17 @@ function json($array, $object = false)
 
 function shorturl($url){
     $length = STRLEN($url);
-    if($length > 165){
-        $length = $length - 65;
+    IF($length > 45){
+        $length = $length - 30;
         $first = SUBSTR($url, 0, -$length);
-        $last = SUBSTR($url, -50);
-        $new = $first."/.../".$last;
+        $last = SUBSTR($url, -15);
+        $new = $first."[ ... ]".$last;
         return $new;
     }else{
         return $url;
     }
 }
+ 
 
 function strip_html_tags( $text )
 {
