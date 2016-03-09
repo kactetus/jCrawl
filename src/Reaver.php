@@ -75,7 +75,8 @@ class Reaver extends Rank
 			// Load the links
 			if(checkUrl($a) && !checkImage($a)) $this->links[] = $a; 
 		}
-		$this->links = array_unique($this->links);
+
+		$this->links = is_array($this->links) ? array_unique($this->links) : [$this->links];
 		return $this->links;
 	}
 
