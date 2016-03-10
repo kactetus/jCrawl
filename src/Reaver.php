@@ -88,6 +88,7 @@ class Reaver extends Rank
 			curl_multi_add_handle($this->mh, $ch[$i]);
 
 			$running = null;
+			
 			do {
 				curl_multi_exec($this->mh, $running);
 			} while ($running);
@@ -102,9 +103,9 @@ class Reaver extends Rank
 
 			$this->followed[] = $this->links[$i];
 
-			$this->index('', $headers);
+			$this->index($response[$i], $headers);
 
-			if($i > 5) return $this->crawling = false; 
+			curl_multi_remove_handle($this->mh, $ch[$i]);
 		}	
 	}
 
