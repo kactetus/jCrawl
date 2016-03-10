@@ -44,6 +44,8 @@ class Reaver extends Rank
 		$ch = [];
 		$response = [];
 
+		$mh = curl_multi_init();
+
 		for($i = 0; $i < count($this->links); $i++) {
 
 			if(in_array($this->links[$i], $this->followed)) continue;
@@ -56,8 +58,6 @@ class Reaver extends Rank
 		    curl_setopt($ch[$i], CURLOPT_FOLLOWLOCATION, true); 
 		    curl_setopt($ch[$i], CURLOPT_AUTOREFERER, true); 
 
-			$mh = curl_multi_init();
-
 			curl_multi_add_handle($mh, $ch[$i]);
 
 			$running = null;
@@ -68,6 +68,7 @@ class Reaver extends Rank
 
 			echo "[]".$this->links[$i]."\n";
 
+			$this->url = $this->links[$i];
 			$this->followed[] = $this->links[$i];
 
 			$response[$i] = curl_multi_getcontent($ch[$i]);
