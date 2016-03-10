@@ -35,17 +35,49 @@ class Reaver extends Rank
 
 	public function fetch()
 	{
-		$ch = curl_init($this->url);
-	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	    curl_setopt($ch, CURLOPT_HEADER, true);
-	    curl_setopt($ch, CURLOPT_HTTPHEADER, $this->agent);
-	    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-	    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); 
-	    curl_setopt($ch, CURLOPT_AUTOREFERER, true); 
-			
-		$response = curl_exec($ch);
+		if(empty($this->links)) {
+			$ch = curl_init($this->url);
+		    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		    curl_setopt($ch, CURLOPT_HEADER, true);
+		    curl_setopt($ch, CURLOPT_HTTPHEADER, $this->agent);
+		    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+		    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); 
+		    curl_setopt($ch, CURLOPT_AUTOREFERER, true); 
+				
+			$response = curl_exec($ch);
 
-		return $response;
+			return $response;
+		}
+		
+		$ch = [];
+		$response = [];
+
+		for($i = 0; $i < count($this->links); $i++) {
+			echo "[]".$this->links[$i]."\n";
+			$ch[$i] = curl_init($this->links[$i]);
+			curl_setopt($ch[$i], CURLOPT_RETURNTRANSFER, 1);
+		    curl_setopt($ch[$i], CURLOPT_HEADER, true);
+		    curl_setopt($ch[$i], CURLOPT_HTTPHEADER, $this->agent);
+		    curl_setopt($ch[$i], CURLOPT_TIMEOUT, 60);
+		    curl_setopt($ch[$i], CURLOPT_FOLLOWLOCATION, true); 
+		    curl_setopt($ch[$i], CURLOPT_AUTOREFERER, true); 
+
+			$mh = curl_multi_init();
+
+			curl_multi_add_handle($mh, $ch[$i]);
+
+			$running = null;
+
+			do {
+				curl_multi_exec($mh, $running);
+			} while ($running);
+
+			$response[$i] = curl_multi_getcontent($ch[$i]);
+			file_put_contents('response.json', $response[$i]);
+			$this->links($response[$i]);
+		}
+
+		
 	}	
 
 	public function links($site)
@@ -61,7 +93,7 @@ class Reaver extends Rank
 			if(checkUrl($a) && !checkImage($a)) $this->links[] = $a; 
 		}
 
-		$this->links = is_array($this->links) ? array_unique($this->links) : [$this->links];
+		$this->links = is_array($this->links) ? $this->links : [$this->links];
 		return $this->links;
 	}
 
@@ -72,30 +104,8 @@ class Reaver extends Rank
 	}
 
 	public function crawl()
-	{
-
-		
-		$ch_1 = curl_init($this->url);
-		curl_setopt($ch_1, CURLOPT_RETURNTRANSFER, 1);
-	    curl_setopt($ch_1, CURLOPT_HEADER, true);
-	    curl_setopt($ch_1, CURLOPT_HTTPHEADER, $this->agent);
-	    curl_setopt($ch_1, CURLOPT_TIMEOUT, 60);
-	    curl_setopt($ch_1, CURLOPT_FOLLOWLOCATION, true); 
-	    curl_setopt($ch_1, CURLOPT_AUTOREFERER, true); 
-
-		$mh = curl_multi_init();
-
-		curl_multi_add_handle($mh, $ch_1);
-
-		$running = null;
-
-		do {
-			curl_multi_exec($mh, $running);
-		} while ($running);
-
-		$response_1 = curl_multi_getcontent($ch_1);
-		var_dump($response_1);
-
+	{		
+		$this->init();
 	}
 
 }
