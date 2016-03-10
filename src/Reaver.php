@@ -32,6 +32,7 @@ class Reaver extends Rank
 		print 'Crawled....'. count($this->url) . ' Pages'. "\n";
 		print 'Found....'. count($this->links) . ' Links'. "\n";
 		print 'Indexed....'. count($this->links) . ' Pages'. "\n";
+		var_dump($this->indexed);
 		print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
 	}
 
@@ -57,14 +58,15 @@ class Reaver extends Rank
 
 	public function index($html, $headers)
 	{
-
+		$indexed = [
+			'headers' => $headers,
+			'site' => $html
+		];
+		$this->indexed[] = json($indexed);
 	}
 
 	public function fetch()
 	{
-		if(count($this->links) > 5000)
-			$this->crawling = false;
-
 		for($i = 0; $i < count($this->links); $i++) {
 
 			if(in_array($this->links[$i], $this->followed)) {
@@ -100,6 +102,10 @@ class Reaver extends Rank
 			echo "[".$headers->status[0]. "] >> " .$this->links[$i] . "\n";
 
 			$this->followed[] = $this->links[$i];
+
+			$this->index($response[$i], $headers);
+
+			if($i > 5) return $this->crawling = false; 
 		}	
 	}
 
