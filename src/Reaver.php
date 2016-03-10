@@ -8,6 +8,25 @@ class Reaver extends Rank
 	public $url;
 	public $links;
 	public $followed;
+	public $agent = [
+	         "User-Agent: reaver-dirge",
+	         "Accept-Language: en-us"
+    ];
+
+	public function __construct()
+	{
+		libxml_use_internal_errors(true) AND libxml_clear_errors();
+		print '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'."\n";
+
+		/*$this->ch = curl_init();
+	    curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
+	    curl_setopt($this->ch, CURLOPT_HEADER, true);
+	    curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->agent);
+	    curl_setopt($this->ch, CURLOPT_TIMEOUT, 60);
+	    curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true); 
+	    curl_setopt($this->ch, CURLOPT_AUTOREFERER, true); */
+	}
+
 
 	public function setUrl($url)
 	{
@@ -56,7 +75,12 @@ class Reaver extends Rank
 	{
 		$ch_1 = curl_init($this->url);
 
-		curl_setopt($ch_1, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch_1, CURLOPT_RETURNTRANSFER, 1);
+	    curl_setopt($ch_1, CURLOPT_HEADER, true);
+	    curl_setopt($ch_1, CURLOPT_HTTPHEADER, $this->agent);
+	    curl_setopt($ch_1, CURLOPT_TIMEOUT, 60);
+	    curl_setopt($ch_1, CURLOPT_FOLLOWLOCATION, true); 
+	    curl_setopt($ch_1, CURLOPT_AUTOREFERER, true); 
 
 		$mh = curl_multi_init();
 
