@@ -6,10 +6,50 @@ class Reaver extends Rank
 {
 
 	public $url;
+	public $links;
+	public $followed;
 
 	public function setUrl($url)
 	{
 		$this->url = is_array($url) ? $url[1] : $url;
+	}
+
+	public function fetch()
+	{
+		$ch = curl_init($this->url);
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	    curl_setopt($ch, CURLOPT_HEADER, true);
+	    curl_setopt($ch, CURLOPT_HTTPHEADER, $this->agent);
+	    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+	    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); 
+	    curl_setopt($ch, CURLOPT_AUTOREFERER, true); 
+			
+		$response = curl_exec($ch);
+
+		return $response;
+	}	
+
+	public function links($site)
+	{
+		$dom = new \DOMDocument('1.0', 'UTF-8');
+		$dom->loadHTML( '<?xml encoding="UTF-8">' . $site,  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		$a = $dom->getElementsByTagName('a');
+		foreach($a as $link) {
+			$a = url_to_absolute($this->url, $link->getAttribute('href'));
+			$a = rtrim($a, '#');
+			$a = rtrim($a, '/');
+			// Load the links
+			if(checkUrl($a) && !checkImage($a)) $this->links[] = $a; 
+		}
+
+		$this->links = is_array($this->links) ? array_unique($this->links) : [$this->links];
+		return $this->links;
+	}
+
+	public function init()
+	{
+		$res = $this->fetch();
+		$this->links($res);
 	}
 
 	public function crawl()
@@ -21,7 +61,6 @@ class Reaver extends Rank
 		$mh = curl_multi_init();
 
 		curl_multi_add_handle($mh, $ch_1);
-
 
 		$running = null;
 

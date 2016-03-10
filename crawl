@@ -11,4 +11,6 @@ $crawler = new Crawler\Reaver;
  */
 $crawler->setUrl($argv);
 
+$crawler->init();
+
 $crawler->crawl();
