@@ -21,7 +21,7 @@ class Reaver extends Rank
 			"User-Agent: reaver-dirge-".uniqid(),
 			"Accept-Language: en-us"
     	];
-    	$this->crawling = true;
+    	$this->crawling = false;
     	$this->mh = curl_multi_init();
 	}
 
@@ -106,6 +106,8 @@ class Reaver extends Rank
 			$this->index($response[$i], $headers);
 
 			curl_multi_remove_handle($this->mh, $ch[$i]);
+
+			if($i > 1) return;
 		}	
 	}
 
@@ -126,16 +128,9 @@ class Reaver extends Rank
 		$this->links = array_values($this->links);
 	}
 
-	public function init()
-	{
-		$this->fetch();	
-	}
-
 	public function crawl() 
 	{
-		do {
-			$this->init();			
-		} while($this->crawling);
+		$this->fetch();			
 	}
 
 }
