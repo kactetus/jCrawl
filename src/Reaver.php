@@ -1,14 +1,17 @@
 <?php namespace Crawler;
 
 use Crawler\Rank;
+use \DOMDocument;
 
 class Reaver extends Rank 
 {
-
 	public $url;
-	public $followed;
+	public $links;
+	public $followed = [];
 	public $indexed;
 	public $agent;
+	public $crawling;
+	public $mh;
 
 	public function __construct()
 	{
@@ -18,52 +21,115 @@ class Reaver extends Rank
 			"User-Agent: reaver-dirge-".uniqid(),
 			"Accept-Language: en-us"
     	];
+    	$this->crawling = true;
+    	$this->mh = curl_multi_init();
+	}
+
+	public function __destruct()
+	{
+		print "\n\n".'Stats: '."\n";
+		print '----------------------------------------------------------------'."\n";
+		print 'Crawled....'. count($this->url) . ' Pages'. "\n";
+		print 'Found....'. count($this->links) . ' Links'. "\n";
+		print 'Indexed....'. count($this->links) . ' Pages'. "\n";
+		print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
 	}
 
 	public function setUrl($url = '')
 	{
 		$this->url = is_array($url) ? $url[1] : $url;
+		$this->links[] = $this->url;
 	}
 
-	public function fetch($url = '')
+	public function headers($url)
 	{
-		if(empty($url))
-			$url = $this->url;
+		@$headers = get_headers($url);
 
-		$ch = curl_init($url);
+		$code = substr($headers[0], 9, 3);
 
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->agent);
-		curl_setopt($ch, CURLOPT_HTTPGET, 1);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); 
-		curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+		$array = [
+			'code' => $code, 
+			'status' => $headers
+		];
 
-		$mh = curl_multi_init();
+		return json($array, true);
+	}
 
-		curl_multi_add_handle($mh, $ch);
+	public function index($html, $headers)
+	{
 
-		$running = null;
-		do {
-			curl_multi_exec($mh, $running);
-		} while ($running);
+	}
 
-		$response = curl_multi_getcontent($ch);
+	public function fetch()
+	{
+		if(count($this->links) > 5000)
+			$this->crawling = false;
 
-		return $response;
+		for($i = 0; $i < count($this->links); $i++) {
+
+			if(in_array($this->links[$i], $this->followed)) {
+				unset($this->links[$i]);
+				$this->links = array_values($this->links);
+			}
+
+			$this->url = $this->links[$i];
+
+			$ch[$i] = curl_init($this->links[$i]);
+
+			curl_setopt($ch[$i], CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch[$i], CURLOPT_HEADER, 0);
+			curl_setopt($ch[$i], CURLOPT_HTTPHEADER, $this->agent);
+			curl_setopt($ch[$i], CURLOPT_HTTPGET, 1);
+			curl_setopt($ch[$i], CURLOPT_TIMEOUT, 60);
+			curl_setopt($ch[$i], CURLOPT_FOLLOWLOCATION, 1); 
+			curl_setopt($ch[$i], CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+
+			curl_multi_add_handle($this->mh, $ch[$i]);
+
+			$running = null;
+			do {
+				curl_multi_exec($this->mh, $running);
+			} while ($running);
+
+			$response[$i] = curl_multi_getcontent($ch[$i]);
+
+			$this->followLinks($response[$i]);
+
+			$headers = $this->headers($this->links[$i]);
+
+			echo "[".$headers->status[0]. "] >> " .$this->links[$i] . "\n";
+
+			$this->followed[] = $this->links[$i];
+		}	
+	}
+
+	public function followLinks($html)
+	{
+		$dom = new DOMDocument('1.0', 'UTF-8');
+		$dom->loadHTML( '<?xml encoding="UTF-8">' . $html,  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		$a = $dom->getElementsByTagName('a');
+		foreach($a as $link) {
+			$a = url_to_absolute($this->url, $link->getAttribute('href'));
+			$a = rtrim($a, '#');
+			$a = rtrim($a, '/');
+			// Load the links
+			if(checkUrl($a) && !checkImage($a)) $this->links[] = $a; 
+		}
+
+		$this->links = is_array($this->links) ? array_unique($this->links) : [$this->links];
+		$this->links = array_values($this->links);
 	}
 
 	public function init()
 	{
-		$response = $this->fetch();	
-		var_dump($response);
+		$this->fetch();	
 	}
 
 	public function crawl() 
 	{
-		$this->init();
+		do {
+			$this->init();			
+		} while($this->crawling);
 	}
 
 }

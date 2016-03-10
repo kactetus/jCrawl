@@ -1,7 +1,6 @@
 <?php namespace Crawler;
 
-
-class Rank {
+class Rank  {
 
 	public function __construct()
 	{
