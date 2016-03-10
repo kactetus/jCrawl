@@ -73,8 +73,9 @@ class Reaver extends Rank
 
 	public function crawl()
 	{
-		$ch_1 = curl_init($this->url);
 
+		
+		$ch_1 = curl_init($this->url);
 		curl_setopt($ch_1, CURLOPT_RETURNTRANSFER, 1);
 	    curl_setopt($ch_1, CURLOPT_HEADER, true);
 	    curl_setopt($ch_1, CURLOPT_HTTPHEADER, $this->agent);
