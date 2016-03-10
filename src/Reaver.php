@@ -27,7 +27,7 @@ class Reaver extends Rank
 		print '----------------------------------------------------------------'."\n";
 		print 'Crawled.... '. number_format(count($this->followed)) . ' Pages'. "\n";
 		print 'Found.... '. number_format(count($this->links)) . ' Links'. "\n";
-		var_dump($this->index);
+
 		print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
 	}
 
@@ -36,7 +36,7 @@ class Reaver extends Rank
 		$this->url = is_array($url) ? $url[1] : $url;
 	}
 
-	public function fetch($following = false) 
+	public function fetch() 
 	{
 		$ch = curl_init($this->url);
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -47,6 +47,7 @@ class Reaver extends Rank
 
 	public function links()
 	{
+
 		$dom = new \DOMDocument('1.0', 'UTF-8');
 		$dom->loadHTML( '<?xml encoding="UTF-8">' . $this->fetch(),  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 		$a = $dom->getElementsByTagName('a');
@@ -93,8 +94,8 @@ class Reaver extends Rank
 				curl_multi_exec($mh, $running);
 			} while ($running);
 
-			$response[$i] = curl_multi_getcontent($ch[$i]);
- 			echo $response[$i];
+			//$response[$i] = curl_multi_getcontent($ch[$i]);
+ 			//var_dump(curl_getinfo($ch[$i]));
 		}
 
 	}
