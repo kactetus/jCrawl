@@ -16,7 +16,7 @@ class Reaver extends Rank
 	public function __construct()
 	{
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
-		print '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'."\n";
+		echo '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'."\n";
 		$this->agent = [
 			"User-Agent: reaver-dirge-".uniqid(),
 			"Accept-Language: en-us"
@@ -27,13 +27,12 @@ class Reaver extends Rank
 
 	public function __destruct()
 	{
-		print "\n\n".'Stats: '."\n";
-		print '----------------------------------------------------------------'."\n";
-		print 'Crawled....'. count($this->url) . ' Pages'. "\n";
-		print 'Found....'. count($this->links) . ' Links'. "\n";
-		print 'Indexed....'. count($this->links) . ' Pages'. "\n";
-		var_dump($this->indexed);
-		print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
+		echo "\n\n".'Stats: '."\n";
+		echo '----------------------------------------------------------------'."\n";
+		echo 'Crawled....'. count($this->url) . ' Pages'. "\n";
+		echo 'Found....'. count($this->links) . ' Links'. "\n";
+		echo 'Indexed....'. count($this->links) . ' Pages'. "\n";
+		echo '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
 	}
 
 	public function setUrl($url = '')
@@ -103,7 +102,7 @@ class Reaver extends Rank
 
 			$this->followed[] = $this->links[$i];
 
-			$this->index($response[$i], $headers);
+			$this->index('', $headers);
 
 			if($i > 5) return $this->crawling = false; 
 		}	
