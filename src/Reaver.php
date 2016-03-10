@@ -6,8 +6,8 @@ class Reaver extends Rank
 {
 
 	public $url;
-	public $links;
-	public $followed;
+	public $links = [];
+	public $followed = [];
 	public $agent = [
 	         "User-Agent: reaver-dirge",
 	         "Accept-Language: en-us"
@@ -17,14 +17,6 @@ class Reaver extends Rank
 	{
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
 		print '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'."\n";
-
-		/*$this->ch = curl_init();
-	    curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
-	    curl_setopt($this->ch, CURLOPT_HEADER, true);
-	    curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->agent);
-	    curl_setopt($this->ch, CURLOPT_TIMEOUT, 60);
-	    curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true); 
-	    curl_setopt($this->ch, CURLOPT_AUTOREFERER, true); */
 	}
 
 
@@ -53,7 +45,9 @@ class Reaver extends Rank
 		$response = [];
 
 		for($i = 0; $i < count($this->links); $i++) {
-			echo "[]".$this->links[$i]."\n";
+
+			if(in_array($this->links[$i], $this->followed)) continue;
+
 			$ch[$i] = curl_init($this->links[$i]);
 			curl_setopt($ch[$i], CURLOPT_RETURNTRANSFER, 1);
 		    curl_setopt($ch[$i], CURLOPT_HEADER, true);
@@ -72,7 +66,12 @@ class Reaver extends Rank
 				curl_multi_exec($mh, $running);
 			} while ($running);
 
+			echo "[]".$this->links[$i]."\n";
+
+			$this->followed[] = $this->links[$i];
+
 			$response[$i] = curl_multi_getcontent($ch[$i]);
+
 			file_put_contents('response.json', $response[$i]);
 			$this->links($response[$i]);
 		}
@@ -106,6 +105,7 @@ class Reaver extends Rank
 	public function crawl()
 	{		
 		$this->init();
+		$this->crawl();
 	}
 
 }
