@@ -13,6 +13,8 @@ class Reaver extends Rank
 	         "Accept-Language: en-us"
     ];
 
+    public $index;
+
     public function __construct()
 	{
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
@@ -25,6 +27,7 @@ class Reaver extends Rank
 		print '----------------------------------------------------------------'."\n";
 		print 'Crawled.... '. number_format(count($this->followed)) . ' Pages'. "\n";
 		print 'Found.... '. number_format(count($this->links)) . ' Links'. "\n";
+		var_dump($this->index);
 		print '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
 	}
 
@@ -33,27 +36,13 @@ class Reaver extends Rank
 		$this->url = is_array($url) ? $url[1] : $url;
 	}
 
-	public function headers()
-	{
-		@$headers = get_headers($this->url);
-
-		$code = substr($headers[0], 9, 3);
-
-		$array = [
-			'code' => $code, 
-			'status' => $headers
-		];
-
-		return json($array, true);
-	}
-
-	public function fetch()
+	public function fetch($following = false) 
 	{
 		$ch = curl_init($this->url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->agent); 
-		return curl_exec($ch);
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	    curl_exec($ch);
+	    $response = curl_multi_getcontent($ch);
+	    return $response;
 	}
 
 	public function links()
@@ -75,40 +64,45 @@ class Reaver extends Rank
 
 	public function init()
 	{
-		$headers 	= $this->headers();
 		$links 		= $this->links();
 
-		echo "[".$headers->status[0] ."] >> " . $this->url ." >> (0) \n";	
+		echo "[] >> " . $this->url ." >> (0) \n";	
 		
 		$result = [
-			'headers' => $headers,
-			'html' => $this->fetch(),
+			'site' => $this->url,
+			'html' => $this->fetch()
 		];		
 
-		$result = json($result);
+		$result = json($result, true);
 
 		$this->followed[] = $this->url;
-
-		var_dump($result);
-	}
-
+		$this->index[] = $result;
+	}	
 
 	public function follow()
 	{
-		foreach($this->links as $link) {
-			if(in_array($link, $this->followed)) {
-				unset($this->links[$link]);
-				continue;
-			}
-			$this->setUrl([0, $link]);
-			$this->crawl();
+		$mh = curl_multi_init();
+		$ch = [];
+		$response = [];
+
+		for($i = 0; $i < count($this->links); $i++) {
+			$ch[$i] = curl_init($this->links[$i]);
+			curl_multi_add_handle($mh, $ch[$i]);
+			$running = null;
+			do {
+				curl_multi_exec($mh, $running);
+			} while ($running);
+
+			$response[$i] = curl_multi_getcontent($ch[$i]);
+ 			echo $response[$i];
 		}
+
 	}
 
 	public function crawl()
 	{
 		$this->init();
-		//$this->follow();
-	}
+		$this->follow();
+	}	
 
 }
