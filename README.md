@@ -13,7 +13,7 @@ Update your composer.json file to include the following require
 ```
 {
 	"require": {
-		"jeremyam/jcrawl": "0.4.x-dev"
+		"jeremyam/jcrawl": "0.5.x-dev"
 	}
 }
 ```
