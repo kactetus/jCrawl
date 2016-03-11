@@ -83,7 +83,7 @@ class Reaver extends Curl
 
 		    $this->followLinks($request->responseText);   
 
-		    $this->index($request->getUrl(), $request->responseText, $request->responseInfo);
+		    $this->index($request->responseText, $request->responseInfo, $request->getUrl());
 			  
 		    echo '['.$request->responseInfo["http_code"].'] >> ' . $request->getUrl() . "(".$request->responseInfo['total_time']." seconds)" . PHP_EOL;
 
