@@ -2,113 +2,38 @@
 
 use Crawler\Rank;
 use \DOMDocument;
+use Crawler\Request;
+use Crawler\Curl;
 
-class Reaver extends Rank 
+
+class Reaver extends Curl 
 {
 	public $url;
 	public $links;
 	public $followed = [];
-	public $indexed;
-	public $agent;
 	public $crawling;
-	public $mh;
 
 	public function __construct()
 	{
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
-		echo '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'."\n";
-		$this->agent = [
-			"User-Agent: reaver-dirge-".uniqid(),
-			"Accept-Language: en-us"
-    	];
-    	$this->crawling = false;
-    	$this->mh = curl_multi_init();
+		echo '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'. PHP_EOL;
+		$this->crawling = true;
 	}
 
 	public function __destruct()
 	{
-		echo "\n\n".'Stats: '."\n";
-		echo '----------------------------------------------------------------'."\n";
-		echo 'Crawled....'. count($this->url) . ' Pages'. "\n";
-		echo 'Found....'. count($this->links) . ' Links'. "\n";
-		echo 'Indexed....'. count($this->links) . ' Pages'. "\n";
-		echo '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'."\n";
+		echo "\n\n".'Stats: '. PHP_EOL;
+		echo '----------------------------------------------------------------'. PHP_EOL;
+		echo 'Crawled....'. count($this->url) . ' Pages'.  PHP_EOL;
+		echo 'Found....'. count($this->links) . ' Links'.  PHP_EOL;
+		echo 'Indexed....'. count($this->followed) . ' Pages'.  PHP_EOL;
+		echo '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'. PHP_EOL;
 	}
 
 	public function setUrl($url = '')
 	{
 		$this->url = is_array($url) ? $url[1] : $url;
 		$this->links[] = $this->url;
-	}
-
-	public function headers($url)
-	{
-		@$headers = get_headers($url);
-
-		$code = substr($headers[0], 9, 3);
-
-		$array = [
-			'code' => $code, 
-			'status' => $headers
-		];
-
-		return json($array, true);
-	}
-
-	public function index($html, $headers)
-	{
-		$indexed = [
-			'headers' => $headers,
-			'site' => $html
-		];
-		$this->indexed[] = json($indexed);
-	}
-
-	public function fetch()
-	{
-		for($i = 0; $i < count($this->links); $i++) {
-
-			if(in_array($this->links[$i], $this->followed)) {
-				unset($this->links[$i]);
-				$this->links = array_values($this->links);
-			}
-
-			$this->url = $this->links[$i];
-
-			$ch[$i] = curl_init($this->links[$i]);
-
-			curl_setopt($ch[$i], CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch[$i], CURLOPT_HEADER, 0);
-			curl_setopt($ch[$i], CURLOPT_HTTPHEADER, $this->agent);
-			curl_setopt($ch[$i], CURLOPT_HTTPGET, 1);
-			curl_setopt($ch[$i], CURLOPT_TIMEOUT, 60);
-			curl_setopt($ch[$i], CURLOPT_FOLLOWLOCATION, 1); 
-			curl_setopt($ch[$i], CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-
-			curl_multi_add_handle($this->mh, $ch[$i]);
-
-			$running = null;
-			
-			do {
-				curl_multi_exec($this->mh, $running);
-			} while ($running);
-
-			$response[$i] = curl_multi_getcontent($ch[$i]);
-
-			$this->followLinks($response[$i]);
-
-			$headers = $this->headers($this->links[$i]);
-
-			echo "[".$headers->status[0]. "] >> " .$this->links[$i] . "\n";
-
-			$this->followed[] = $this->links[$i];
-
-			$this->index($response[$i], $headers);
-
-			curl_multi_remove_handle($this->mh, $ch[$i]);
-
-			if($i > 1) return;
-		}	
 	}
 
 	public function followLinks($html)
@@ -128,9 +53,56 @@ class Reaver extends Rank
 		$this->links = array_values($this->links);
 	}
 
-	public function crawl() 
+	public function index($html, $headers, $url)
 	{
-		$this->fetch();			
+		$indexed = [
+			'url' => $url,
+			'headers' => $headers,
+			'site' => $html
+		];
+	}
+
+	public function fetch()
+	{
+		for($i = 0; $i < count($this->links); $i++) {
+			if(in_array($this->links[$i], $this->followed)) {
+				unset($this->links[$i]);
+				$this->links = array_values($this->links);
+				continue;
+			}
+			$this->get($this->links[$i]);
+		}
+
+		$results = array();
+
+		$start = microtime(true);
+
+		echo '['.date('Y-m-d h:i:s a').'] Fetching Seed url...'. PHP_EOL;
+
+		$this->setCallback(function(Request $request, Curl $rollingCurl) use (&$results) {
+
+		    $this->followLinks($request->responseText);   
+
+		    $this->index($request->getUrl(), $request->responseText, $request->responseInfo);
+			  
+		    echo '['.$request->responseInfo["http_code"].'] >> ' . $request->getUrl() . "(".$request->responseInfo['total_time']." seconds)" . PHP_EOL;
+
+		    $this->followed[] = $request->getUrl();
+
+	    })->setSimultaneousLimit(20)->execute();
+
+		echo "...done in " . (microtime(true) - $start) . PHP_EOL;
+
+		echo "All results: " . PHP_EOL;
+
+	}
+
+	public function crawl()
+	{
+		do {
+			$this->fetch();	
+		} while ($this->crawling);
+		
 	}
 
 }
