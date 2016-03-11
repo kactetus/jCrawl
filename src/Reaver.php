@@ -12,6 +12,8 @@ class Reaver extends Curl
 	public $links;
 	public $followed = [];
 	public $crawling;
+	public $title;
+	public $description;
 
 	public function __construct()
 	{
@@ -36,7 +38,7 @@ class Reaver extends Curl
 		$this->links[] = $this->url;
 	}
 
-	public function followLinks($html)
+	public function scrape($html)
 	{
 		$dom = new DOMDocument('1.0', 'UTF-8');
 		$dom->loadHTML( '<?xml encoding="UTF-8">' . $html,  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -49,6 +51,25 @@ class Reaver extends Curl
 			if(checkUrl($a) && !checkImage($a)) $this->links[] = $a; 
 		}
 
+		$title = $dom->getElementsByTagName('title')[0];
+		$title = $title->nodeValue;
+		$meta = $dom->getElementsByTagName('meta');
+		$description = '';
+
+		foreach($meta as $desc) {
+			if($desc->hasAttribute('name') && $desc->getAttribute('name') == 'description') {
+				$description = $desc->getAttribute('content');
+				break;
+			} else {
+				$body = $dom->getElementsByTagName('body')[0];
+				$body = isset($body->nodeValue) ? $body->nodeValue : '';
+				$description = truncate($body, 1000);
+			}
+		}
+
+		$this->title = $title;
+		$this->description = $description;
+
 		$this->links = is_array($this->links) ? array_unique($this->links) : [$this->links];
 		$this->links = array_values($this->links);
 	}
@@ -57,8 +78,10 @@ class Reaver extends Curl
 	{
 		$indexed = [
 			'url' => $url,
+			'title' => $this->title, 
+			'description' => $this->description,
 			'headers' => $headers,
-			'site' => $html
+			'site' => strip_tags($html)
 		];
 	}
 
@@ -81,7 +104,7 @@ class Reaver extends Curl
 
 		$this->setCallback(function(Request $request, Curl $rollingCurl) use (&$results) {
 
-		    $this->followLinks($request->responseText);   
+		    $this->scrape($request->responseText);   
 
 		    $this->index($request->responseText, $request->responseInfo, $request->getUrl());
 			  
