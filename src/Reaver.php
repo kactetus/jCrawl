@@ -48,6 +48,8 @@ class Reaver extends Curl
 			$a = url_to_absolute($this->url, $link->getAttribute('href'));
 			$a = rtrim($a, '#');
 			$a = rtrim($a, '/');
+			$a = strtok($a, "?");
+			$a = strtok($a, "#");
 			// Load the links
 			if(checkUrl($a) && !checkImage($a)) $this->links[] = $a; 
 		}
