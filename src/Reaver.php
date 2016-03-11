@@ -38,8 +38,9 @@ class Reaver extends Curl
 		$this->links[] = $this->url;
 	}
 
-	public function scrape($html)
+	public function scrape($html, $url)
 	{
+		$this->url = $url;
 		$dom = new DOMDocument('1.0', 'UTF-8');
 		$dom->loadHTML( '<?xml encoding="UTF-8">' . $html,  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 		$a = $dom->getElementsByTagName('a');
@@ -94,7 +95,6 @@ class Reaver extends Curl
 				continue;
 			}
 			$this->get($this->links[$i]);
-			$this->url = $this->links[$i];
 		}
 
 		$results = array();
@@ -105,7 +105,7 @@ class Reaver extends Curl
 
 		$this->setCallback(function(Request $request, Curl $rollingCurl) use (&$results) {
 
-		    $this->scrape($request->responseText);   
+		    $this->scrape($request->responseText, $request->getUrl());   
 
 		    $this->index($request->responseText, $request->responseInfo, $request->getUrl());
 			  
