@@ -94,6 +94,7 @@ class Reaver extends Curl
 				continue;
 			}
 			$this->get($this->links[$i]);
+			$this->url = $this->links[$i];
 		}
 
 		$results = array();
