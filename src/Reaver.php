@@ -13,8 +13,6 @@ class Reaver extends Curl
 	public $links;
 	public $followed = [];
 	public $crawling;
-	public $title;
-	public $description;
 	public $robots;
 
 	public function __construct()
@@ -81,20 +79,26 @@ class Reaver extends Curl
 			}
 		}
 
-		$this->title = $title;
-		$this->description = $description;
-
+		$this->index($url, $title, $description, $html);
 		$this->links = is_array($this->links) ? array_unique($this->links) : [$this->links];
 		$this->links = array_values($this->links);
 	}
 
-	public function index($html, $headers, $url)
+	/**
+	 * This function sits as a demonstration. Here, you can extend 
+	 * Reaver and implement this function to store crawled data
+	 * in a database solution of your choosing.
+	 * @param  [string] $url       [The current url that has been crawled]
+	 * @param  [string] $title     [The scraped title from the Document]
+	 * @param  [string] $description [The scraped description from the Document]
+	 * @param  [string] $html        [The raw html from the curl response]
+	 */
+	public function index($url, $title, $description, $html)
 	{
 		$indexed = [
 			'url' => $url,
-			'title' => $this->title, 
-			'description' => $this->description,
-			'headers' => $headers,
+			'title' => $title, 
+			'description' => $description,
 			'site' => strip_tags($html)
 		];
 	}
@@ -119,8 +123,6 @@ class Reaver extends Curl
 		$this->setCallback(function(Request $request, Curl $rollingCurl) use ($results) {
 
 		    $this->scrape($request->responseText, $request->getUrl());   
-
-		    $this->index($request->responseText, $request->responseInfo, $request->getUrl());
 			  
 		    echo '['.$request->responseInfo["http_code"].'] >> ' . $request->getUrl() . "(".$request->responseInfo['total_time']." seconds)" . PHP_EOL;
 
