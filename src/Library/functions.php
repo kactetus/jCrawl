@@ -80,6 +80,12 @@ function checkImage($image)
 {
 	return preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $image);
 }
+
+function validUrl($url) {
+    if (!$fp = curl_init($url)) return false;
+    return true;
+}
+
 function checkUrl($url)
 {
     if(is_array($url)) 

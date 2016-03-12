@@ -4,6 +4,7 @@ use Crawler\Rank;
 use \DOMDocument;
 use Crawler\Request;
 use Crawler\Curl;
+use Carbon\Carbon;
 
 
 class Reaver extends Curl 
@@ -14,6 +15,7 @@ class Reaver extends Curl
 	public $crawling;
 	public $title;
 	public $description;
+	public $robots;
 
 	public function __construct()
 	{
@@ -35,7 +37,16 @@ class Reaver extends Curl
 	public function setUrl($url = '')
 	{
 		$this->url = is_array($url) ? $url[1] : $url;
+
+		if(!validUrl($this->url) || !checkUrl($this->url)) 
+			die('Please use a valid url');
+
 		$this->links[] = $this->url;
+	}
+
+	public function robots()
+	{
+		$this->robots = fetch($this->url.'/robots.txt');
 	}
 
 	public function scrape($html, $url)
@@ -55,7 +66,7 @@ class Reaver extends Curl
 		}
 
 		$title = $dom->getElementsByTagName('title')[0];
-		$title = $title->nodeValue;
+		$title = !is_null($title) ? $title->nodeValue : $this->url;
 		$meta = $dom->getElementsByTagName('meta');
 		$description = '';
 
@@ -84,7 +95,8 @@ class Reaver extends Curl
 			'title' => $this->title, 
 			'description' => $this->description,
 			'headers' => $headers,
-			'site' => strip_tags($html)
+			'site' => strip_tags($html),
+			''
 		];
 	}
 
@@ -99,13 +111,13 @@ class Reaver extends Curl
 			$this->get($this->links[$i]);
 		}
 
-		$results = array();
+		$results = [];
 
 		$start = microtime(true);
 
 		echo '['.date('Y-m-d h:i:s a').'] Fetching Seed url...'. PHP_EOL;
 
-		$this->setCallback(function(Request $request, Curl $rollingCurl) use (&$results) {
+		$this->setCallback(function(Request $request, Curl $rollingCurl) use ($results) {
 
 		    $this->scrape($request->responseText, $request->getUrl());   
 
@@ -117,17 +129,20 @@ class Reaver extends Curl
 
 	    })->setSimultaneousLimit(20)->execute();
 
-		echo "...done in " . (microtime(true) - $start) . PHP_EOL;
+	    $this->fetch();
 
-		echo "All results: " . PHP_EOL;
+		echo '['.date('Y-m-d h:i:s a').'] Crawl Completed >> ' . (microtime(true) - $start) . PHP_EOL;
+
+		echo '['.date('Y-m-d h:i:s a').'] Gathering Statistics...' . PHP_EOL;
 
 	}
 
 	public function crawl()
 	{
-		do {
+		/*do {
 			$this->fetch();	
-		} while ($this->crawling);
+		} while ($this->crawling);*/
+		$this->fetch();
 		
 	}
 
