@@ -95,8 +95,7 @@ class Reaver extends Curl
 			'title' => $this->title, 
 			'description' => $this->description,
 			'headers' => $headers,
-			'site' => strip_tags($html),
-			''
+			'site' => strip_tags($html)
 		];
 	}
 
