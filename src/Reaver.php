@@ -17,7 +17,7 @@ class Reaver extends Curl
 	public function __construct()
 	{
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
-		echo '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'. PHP_EOL;
+		echo '['.Carbon::now().'] Initializing Reaver...'. PHP_EOL;
 		echo '['.Carbon::now().'] Fetching Seed url...'. PHP_EOL;
 	}
 
@@ -112,7 +112,7 @@ class Reaver extends Curl
 
 		    $this->scrape($request->responseText, $request->getUrl());   
 			  
-		    echo '['.$request->responseInfo["http_code"].'] >> ' . $request->getUrl() . "(".$request->responseInfo['total_time']." seconds)" . PHP_EOL;
+		    echo '['. Carbon::now().'] ' . "(".$request->responseInfo["http_code"] .") >> ". $request->getUrl() . "(".$request->responseInfo['total_time']." seconds)" . PHP_EOL;
 
 		    $this->followed[] = $request->getUrl();
 
