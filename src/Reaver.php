@@ -93,6 +93,8 @@ class Reaver extends Curl
 		$this->scrape($dom['html'], $this->links[0]);
 		echo '['.Carbon::now().'] Found seed url >> '. $this->links[0] . PHP_EOL;
 		echo '['.Carbon::now().'] Starting crawl... '.PHP_EOL;
+
+		$this->followed[] = $this->links[0];
 	}
 
 	public function crawl()
