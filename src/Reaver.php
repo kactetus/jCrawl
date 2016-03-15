@@ -18,16 +18,16 @@ class Reaver extends Curl
 	{
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
 		echo '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'. PHP_EOL;
+		echo '['.Carbon::now().'] Fetching Seed url...'. PHP_EOL;
 	}
 
 	public function __destruct()
 	{
 		echo "\n\n".'Stats: '. PHP_EOL;
 		echo '----------------------------------------------------------------'. PHP_EOL;
-		echo 'Crawled....'. count($this->url) . ' Pages'.  PHP_EOL;
 		echo 'Found....'. count($this->links) . ' Links'.  PHP_EOL;
 		echo 'Indexed....'. count($this->followed) . ' Pages'.  PHP_EOL;
-		echo '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'. PHP_EOL;
+		echo '['.Carbon::now().'] Shutting Reaver Down...'. PHP_EOL;
 	}
 
 	public function setUrl($url = '')
@@ -91,6 +91,8 @@ class Reaver extends Curl
 	{
 		$dom = fetch($this->links[0]);
 		$this->scrape($dom['html'], $this->links[0]);
+		echo '['.Carbon::now().'] Found seed url >> '. $this->links[0] . PHP_EOL;
+		echo '['.Carbon::now().'] Starting crawl... '.PHP_EOL;
 	}
 
 	public function crawl()
@@ -103,8 +105,6 @@ class Reaver extends Curl
 			}
 			$this->get($this->links[$i]);
 		}
-
-		echo '['.date('Y-m-d h:i:s a').'] Fetching Seed url...'. PHP_EOL;
 
 		$this->setCallback(function(Request $request, Curl $rollingCurl) {
 
