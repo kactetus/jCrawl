@@ -13,13 +13,11 @@ class Reaver extends Curl
 	public $links;
 	public $followed = [];
 	public $crawling;
-	public $robots;
 
 	public function __construct()
 	{
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
 		echo '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'. PHP_EOL;
-		$this->crawling = true;
 	}
 
 	public function __destruct()
@@ -40,11 +38,6 @@ class Reaver extends Curl
 			die('Please use a valid url');
 
 		$this->links[] = $this->url;
-	}
-
-	public function robots()
-	{
-		$this->robots = fetch($this->url.'/robots.txt');
 	}
 
 	public function scrape($html, $url)
@@ -84,15 +77,6 @@ class Reaver extends Curl
 		$this->links = array_values($this->links);
 	}
 
-	/**
-	 * This function sits as a demonstration. Here, you can extend 
-	 * Reaver and implement this function to store crawled data
-	 * in a database solution of your choosing.
-	 * @param  [string] $url       [The current url that has been crawled]
-	 * @param  [string] $title     [The scraped title from the Document]
-	 * @param  [string] $description [The scraped description from the Document]
-	 * @param  [string] $html        [The raw html from the curl response]
-	 */
 	public function index($url, $title, $description, $html)
 	{
 		$indexed = [
@@ -105,6 +89,12 @@ class Reaver extends Curl
 
 	public function fetch()
 	{
+		$dom = fetch($this->links[0]);
+		$this->scrape($dom['html'], $this->links[0]);
+	}
+
+	public function crawl()
+	{
 		for($i = 0; $i < count($this->links); $i++) {
 			if(in_array($this->links[$i], $this->followed)) {
 				unset($this->links[$i]);
@@ -114,13 +104,9 @@ class Reaver extends Curl
 			$this->get($this->links[$i]);
 		}
 
-		$results = [];
-
-		$start = microtime(true);
-
 		echo '['.date('Y-m-d h:i:s a').'] Fetching Seed url...'. PHP_EOL;
 
-		$this->setCallback(function(Request $request, Curl $rollingCurl) use ($results) {
+		$this->setCallback(function(Request $request, Curl $rollingCurl) {
 
 		    $this->scrape($request->responseText, $request->getUrl());   
 			  
@@ -130,21 +116,6 @@ class Reaver extends Curl
 
 	    })->setSimultaneousLimit(20)->execute();
 
-	    $this->fetch();
-
-		echo '['.date('Y-m-d h:i:s a').'] Crawl Completed >> ' . (microtime(true) - $start) . PHP_EOL;
-
-		echo '['.date('Y-m-d h:i:s a').'] Gathering Statistics...' . PHP_EOL;
-
-	}
-
-	public function crawl()
-	{
-		/*do {
-			$this->fetch();	
-		} while ($this->crawling);*/
-		$this->fetch();
-		
 	}
 
 }
