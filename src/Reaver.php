@@ -2,8 +2,6 @@
 
 use \DOMDocument;
 use Carbon\Carbon;
-use Dotenv\Dotenv;
-
 
 class Reaver extends DOMDocument
 {
