@@ -1,5 +1,4 @@
 <?php
-
 function truncate($string, $length=100, $append="&hellip;")
 {
 	$string = trim($string);

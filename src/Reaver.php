@@ -54,12 +54,8 @@ class Reaver extends DOMDocument
 		$this->ch = curl_init();
 		curl_setopt($this->ch, CURLOPT_URL, $this->url);
 	    curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-	    curl_setopt($this->ch, CURLOPT_HEADER, 0);
 	    curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->agent);
-	    curl_setopt($this->ch, CURLOPT_HTTPGET, 1);
-	    curl_setopt($this->ch, CURLOPT_TIMEOUT, 60);
 	    curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true); 
-	    curl_setopt($this->ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 	}
 
 	public function fetch()
@@ -70,6 +66,7 @@ class Reaver extends DOMDocument
 		$running = null;
 
 		do {
+			curl_multi_select($this->mh);
 			curl_multi_exec($this->mh, $running);
 		} while ($running);
 
@@ -89,8 +86,6 @@ class Reaver extends DOMDocument
 			$a = url_to_absolute($this->url, $link->getAttribute('href'));
 			$a = rtrim($a, '#');
 			$a = rtrim($a, '/');
-			$a = strtok($a, "?");
-			$a = strtok($a, "#");
 			// Load the links
 			if(checkUrl($a) && !checkImage($a)) $this->links[] = $a; 
 		}
