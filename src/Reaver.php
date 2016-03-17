@@ -66,7 +66,7 @@ class Reaver extends DOMDocument
 		$running = null;
 
 		do {
-			curl_multi_select($this->mh);
+			curl_multi_select($this->mh, 1);
 			curl_multi_exec($this->mh, $running);
 		} while ($running);
 
