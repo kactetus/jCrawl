@@ -1,21 +1,34 @@
 <?php namespace Crawler;
 
-use Crawler\Rank;
 use \DOMDocument;
-use Crawler\Request;
-use Crawler\Curl;
 use Carbon\Carbon;
+use Dotenv\Dotenv;
 
 
-class Reaver extends Curl 
+class Reaver extends DOMDocument
 {
 	public $url;
 	public $links;
 	public $followed = [];
-	public $crawling;
-
+	public $follow;
+	public $ch;
+	public $agent = ["User-Agent: reaver-dirge", "Accept-Language: en-us"];
+	public $html;
+     
+	
 	public function __construct()
 	{
+		parent::__construct("1.0", "UTF-8");
+
+		$this->registerNodeClass('DOMNode', __NAMESPACE__ . '\Reaver');
+
+		$this->preserveWhiteSpace = false;
+		$this->strictErrorChecking = false;
+
+		$this->url = getenv("SERVER");
+
+		$this->follow = false;
+
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
 		echo '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'. PHP_EOL;
 	}
@@ -30,21 +43,31 @@ class Reaver extends Curl
 		echo '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'. PHP_EOL;
 	}
 
-	public function setUrl($url = '')
+	public function init()
 	{
-		$this->url = is_array($url) ? $url[1] : $url;
-
-		if(!validUrl($this->url) || !checkUrl($this->url)) 
-			die('Please use a valid url');
-
-		$this->links[] = $this->url;
+		$this->ch = curl_init();
+		curl_setopt($this->ch, CURLOPT_URL, $this->url);
+	    curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+	    curl_setopt($this->ch, CURLOPT_HEADER, 0);
+	    curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->agent);
+	    curl_setopt($this->ch, CURLOPT_HTTPGET, 1);
+	    curl_setopt($this->ch, CURLOPT_TIMEOUT, 60);
+	    curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true); 
+	    curl_setopt($this->ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 	}
 
-	public function scrape($html, $url)
+	public function fetch()
 	{
-		$this->url = $url;
-		$dom = new DOMDocument('1.0', 'UTF-8');
-		$dom->loadHTML( '<?xml encoding="UTF-8">' . $html,  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		$this->html = curl_exec($this->ch);
+		$this->scrape();
+
+		var_dump($this->html);
+	}
+
+
+	public function scrape()
+	{
+		$dom = $this->loadHTML( '<?xml encoding="UTF-8">' . $this->html,  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 		$a = $dom->getElementsByTagName('a');
 		foreach($a as $link) {
 			$a = url_to_absolute($this->url, $link->getAttribute('href'));
@@ -87,35 +110,10 @@ class Reaver extends Curl
 		];
 	}
 
-	public function fetch()
-	{
-		$dom = fetch($this->links[0]);
-		$this->scrape($dom['html'], $this->links[0]);
-	}
-
+	
 	public function crawl()
 	{
-		for($i = 0; $i < count($this->links); $i++) {
-			if(in_array($this->links[$i], $this->followed)) {
-				unset($this->links[$i]);
-				$this->links = array_values($this->links);
-				continue;
-			}
-			$this->get($this->links[$i]);
-		}
-
-		echo '['.date('Y-m-d h:i:s a').'] Fetching Seed url...'. PHP_EOL;
-
-		$this->setCallback(function(Request $request, Curl $rollingCurl) {
-
-		    $this->scrape($request->responseText, $request->getUrl());   
-			  
-		    echo '['.$request->responseInfo["http_code"].'] >> ' . $request->getUrl() . "(".$request->responseInfo['total_time']." seconds)" . PHP_EOL;
-
-		    $this->followed[] = $request->getUrl();
-
-	    })->setSimultaneousLimit(20)->execute();
-
+		$this->fetch();
 	}
 
 }

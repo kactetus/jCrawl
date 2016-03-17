@@ -11,14 +11,16 @@
     "require": {
         "php": ">=5.6.0",
         "nesbot/carbon": "^1.21",
-        "illuminate/database": "^5.2"
+        "illuminate/database": "^5.2",
+        "vlucas/phpdotenv": "^2.2"
     },
     "autoload": {
         "psr-4": {
             "Crawler\\": "src/"
         },
         "files": [
-            "src/Library/functions.php"
+            "src/Library/functions.php",
+            "src/app/config.php"
         ]
     },
     "extra": {

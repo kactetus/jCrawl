@@ -2,3 +2,4 @@
 /storage/
 response.json
 composer.lock
+.env

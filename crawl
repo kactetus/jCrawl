@@ -1,6 +1,9 @@
 #!/usr/bin/env php
 <?php
 require __DIR__.'/vendor/autoload.php';
+
+
+
 /**
  * Get a crawler started
  * @var Crawler
@@ -9,8 +12,7 @@ $crawler = new Crawler\Reaver;
 /**
  * Let's get his party started.
  */
-$crawler->setUrl($argv);
 
-$crawler->fetch();
+$crawler->init();
 
 $crawler->crawl();
