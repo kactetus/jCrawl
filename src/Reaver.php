@@ -60,15 +60,13 @@ class Reaver extends DOMDocument
 	{
 		$this->html = curl_exec($this->ch);
 		$this->scrape();
-
-		var_dump($this->html);
 	}
 
 
 	public function scrape()
 	{
-		$dom = $this->loadHTML( '<?xml encoding="UTF-8">' . $this->html,  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-		$a = $dom->getElementsByTagName('a');
+		$this->loadHTML( '<?xml encoding="UTF-8">' . $this->html,  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		$a = $this->getElementsByTagName('a');
 		foreach($a as $link) {
 			$a = url_to_absolute($this->url, $link->getAttribute('href'));
 			$a = rtrim($a, '#');
@@ -79,9 +77,9 @@ class Reaver extends DOMDocument
 			if(checkUrl($a) && !checkImage($a)) $this->links[] = $a; 
 		}
 
-		$title = $dom->getElementsByTagName('title')[0];
+		$title = $this->getElementsByTagName('title')[0];
 		$title = !is_null($title) ? $title->nodeValue : $this->url;
-		$meta = $dom->getElementsByTagName('meta');
+		$meta = $this->getElementsByTagName('meta');
 		$description = '';
 
 		foreach($meta as $desc) {
@@ -89,24 +87,24 @@ class Reaver extends DOMDocument
 				$description = $desc->getAttribute('content');
 				break;
 			} else {
-				$body = $dom->getElementsByTagName('body')[0];
+				$body = $this->getElementsByTagName('body')[0];
 				$body = isset($body->nodeValue) ? $body->nodeValue : '';
 				$description = truncate($body, 1000);
 			}
 		}
 
-		$this->index($url, $title, $description, $html);
+		$this->index($title, $description);
 		$this->links = is_array($this->links) ? array_unique($this->links) : [$this->links];
 		$this->links = array_values($this->links);
 	}
 
-	public function index($url, $title, $description, $html)
+	public function index($title, $description)
 	{
 		$indexed = [
-			'url' => $url,
+			'url' => $this->url,
 			'title' => $title, 
 			'description' => $description,
-			'site' => strip_tags($html)
+			'site' => strip_tags($this->html)
 		];
 	}
 
