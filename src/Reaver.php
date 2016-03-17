@@ -10,9 +10,12 @@ class Reaver extends DOMDocument
 	public $followed = [];
 	public $follow;
 	public $ch;
+	public $mh;
 	public $agent = ["User-Agent: reaver-dirge", "Accept-Language: en-us"];
 	public $html;
-     
+	public $title;
+	public $description;
+	public $indexed;
 	
 	public function __construct()
 	{
@@ -27,8 +30,10 @@ class Reaver extends DOMDocument
 
 		$this->follow = false;
 
+		$this->mh = curl_multi_init();
+
 		libxml_use_internal_errors(true) AND libxml_clear_errors();
-		echo '['.date('Y-m-d h:i:s a').'] Initializing Reaver...'. PHP_EOL;
+		echo '['.Carbon::now().'] Initializing Reaver...'. PHP_EOL;
 	}
 
 	public function __destruct()
@@ -38,7 +43,10 @@ class Reaver extends DOMDocument
 		echo 'Crawled....'. count($this->url) . ' Pages'.  PHP_EOL;
 		echo 'Found....'. count($this->links) . ' Links'.  PHP_EOL;
 		echo 'Indexed....'. count($this->followed) . ' Pages'.  PHP_EOL;
-		echo '['.date('Y-m-d h:i:s a').'] Shutting Reaver Down...'. PHP_EOL;
+		echo '----------------------------------------------------------------'. PHP_EOL;
+		echo 'Results:'.PHP_EOL;
+		file_put_contents('response.json', $this->indexed);
+		echo '['.Carbon::now().'] Shutting Reaver Down...'. PHP_EOL;
 	}
 
 	public function init()
@@ -56,8 +64,20 @@ class Reaver extends DOMDocument
 
 	public function fetch()
 	{
-		$this->html = curl_exec($this->ch);
+		$this->init();
+		curl_multi_add_handle($this->mh, $this->ch);
+
+		$running = null;
+
+		do {
+			curl_multi_exec($this->mh, $running);
+		} while ($running);
+
+		$this->html = curl_multi_getcontent($this->ch);
+
 		$this->scrape();
+
+		$this->followed[] = $this->url;
 	}
 
 
@@ -91,25 +111,36 @@ class Reaver extends DOMDocument
 			}
 		}
 
-		$this->index($title, $description);
 		$this->links = is_array($this->links) ? array_unique($this->links) : [$this->links];
 		$this->links = array_values($this->links);
+
+		$this->title = $title;
+		$this->description = $description;
+		$this->index();
+
 	}
 
-	public function index($title, $description)
+	public function index()
 	{
+		echo '['.Carbon::now().'] (200) >> '. $this->url .PHP_EOL;
 		$indexed = [
 			'url' => $this->url,
-			'title' => $title, 
-			'description' => $description,
-			'site' => strip_tags($this->html)
+			'title' => $this->title, 
+			'description' => $this->description,
+			'site' => preg_replace('/(\s)+/', ' ', strip_tags($this->html))
 		];
+
+		$this->indexed[] = json($indexed);
 	}
 
 	
-	public function crawl()
+	public function run()
 	{
-		$this->fetch();
+		foreach($this->links as $link) {
+			$this->url = $link;
+			$this->fetch();
+		}
+
 	}
 
 }

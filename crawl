@@ -13,6 +13,6 @@ $crawler = new Crawler\Reaver;
  * Let's get his party started.
  */
 
-$crawler->init();
+$crawler->fetch();
 
-$crawler->crawl();
+$crawler->run();
