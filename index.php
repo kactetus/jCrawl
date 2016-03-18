@@ -129,12 +129,17 @@
 
 	.alert {
 		margin: 20px 0;
-		background: green;
+		background: rgb(247, 247, 247);
 		padding: 25px;
-		color: #fff;
 	}
-	.alert > strong {
-		color: #fff;
+	.top-form {
+		background: #666;
+		border: none;
+		padding: 10px;
+		margin-top: 5px;
+	}
+	.top-form:focus {
+		background: #fff;
 	}
 </style>
 
@@ -152,7 +157,7 @@
 		</div>
 		<div class="search">
 			<form action="index.php" method="get">
-				<input style="margin-top: 9px" type="text" name="q" class="form-control" value="<?php if(isset($_GET['q'])) echo $_GET['q']; ?>">
+				<input type="text" name="q" class="form-control top-form" value="<?php if(isset($_GET['q'])) echo $_GET['q']; ?>">
 			</form>
 		</div>
 		<ul class="menu">
@@ -193,7 +198,7 @@
 
 	<div class="container">
 		<?php if(isset($_GET['site']) && $_GET['site'] == 'added'): ?>
-			<div class="alert alert-success">
+			<div class="alert">
 				<strong>Success!</strong> Your site has been added and is currently being crawled.
 			</div>
 		<?php endif; ?>
