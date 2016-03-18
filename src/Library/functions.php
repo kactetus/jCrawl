@@ -354,7 +354,7 @@ function highlight($text, $words) {
     preg_match_all('~\w+~', $words, $m);
     if(!$m)
         return $text;
-    $re = '~\\b(' . implode('|', $m[0]) . ')\\b~i';
+    $re = '~\\strong(' . implode('|', $m[0]) . ')\\strong~i';
     return preg_replace($re, '<b>$0</b>', $text);
 }
 

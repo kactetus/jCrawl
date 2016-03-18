@@ -150,17 +150,21 @@
 
 	<?php 
 	$query = '%'.$_GET['q'].'%';
-	$sites = \Crawler\Sites::where('description', 'like', $query)->orWhere('title', 'like', $query)->orWhere('html', 'like', $query)->get(); 
+	$sites = \Crawler\Sites::where('description', 'like', $query)
+							->orWhere('title', 'like', $query)
+							->orWhere('html', 'like', $query)
+							->get(); 
 	?>
 	
 	<div class="result-info">
+		<h1> Searching <?php echo $_GET['q']; ?></h1>
 		About <?php echo $sites->count(); ?> results...
 	</div>
 
 	<?php foreach($sites as $site): ?>
 		<div class="result">
-			<a href="" class="title"><?php echo truncate($site->title, 50); ?></a>
-			<a href="" class="url"><?php echo shorturl($site->url); ?></a>
+			<a href="<?php echo $site->url; ?>" target="_blank" class="title"><?php echo truncate(highlight($site->title, $query), 50); ?></a>
+			<a href="<?php echo $site->url; ?>" target="_blank" class="url"><?php echo shorturl($site->url); ?></a>
 			<p class="description"><?php echo highlight($site->description, $query); ?></p>
 		</div>
 	<?php endforeach; ?>
