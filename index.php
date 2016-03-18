@@ -10,6 +10,7 @@
 <title>jCrawl - PHP Web Crawler</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://necolas.github.io/normalize.css/3.0.3/normalize.css">
 <style>
 	body, html, * {
 		padding: 0;
@@ -22,6 +23,9 @@
 	body {
 		padding-top: 60px;
 		color: #333;
+	}
+	h1, h2, h3, h4, h5, h6 {
+		font-weight: 300;
 	}
 	nav {
 		background: rgb(51, 51, 51);
@@ -94,7 +98,7 @@
 		width: 100%;
 		height: 15px;
 		display: inline-block;
-		padding: 5px 15px;
+		padding: 5px;
 		border: 1px solid rgb(230, 230, 230);
 		font-size: 1.1em;
 	}
@@ -106,11 +110,12 @@
 	.result {
 		width: 60%;
 		margin-bottom: 25px;
+		overflow: hidden;
 	}
 	.title {
 		color: #000;
 		display: block;
-		font-size: 1.1em;
+		font-size: 1.3em;
 	}
 	.url {
 		display: block;
@@ -134,9 +139,9 @@
 	}
 	.top-form {
 		background: #666;
-		border: none;
-		padding: 10px;
-		margin-top: 5px;
+		border-color: #777;
+		padding: 8px;
+		margin-top: 6px;
 	}
 	.top-form:focus {
 		background: #fff;
@@ -150,27 +155,14 @@
     <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
 
-<nav class="nav">
-	<div class="nav-container">
-		<div class="logo">
-			<a href="/">jCrawl</a>
-		</div>
-		<div class="search">
-			<form action="index.php" method="get">
-				<input type="text" name="q" class="form-control top-form" value="<?php if(isset($_GET['q'])) echo $_GET['q']; ?>">
-			</form>
-		</div>
-		<ul class="menu">
-			<li><a href="/?p=admin">Admin</a></li>
-		</ul>
-	</div>
-</nav>
+<?php include __DIR__.'/header.php'; ?>
 
 <div class="container">
 <?php if(isset($_GET['q']) && !isset($_GET['p'])): ?>
 
 	<?php 
 	$query = '%'.$_GET['q'].'%';
+	$query = str_replace(' ', '%', $query);
 	$sites = \Crawler\Sites::where('description', 'like', $query)
 							->orWhere('title', 'like', $query)
 							->orWhere('html', 'like', $query)
@@ -179,10 +171,10 @@
 	
 	<div class="result-info">
 		<h1> Searching for "<?php echo $_GET['q']; ?>"</h1>
-		About <?php echo $sites->count(); ?> results...
+		About <?php echo number_format($sites->count()); ?> results...
 	</div>
 
-	<?php foreach($sites as $site): htmlspecialchars($site->title); htmlspecialchars($site->description);?>
+	<?php foreach($sites as $site): $site->title = strip_tags($site->title); $site->description = strip_tags($site->description);?>
 		<div class="result">
 			<a href="<?php echo $site->url; ?>" target="_blank" class="title"><?php echo truncate(highlight($site->title, $query), 50); ?></a>
 			<a href="<?php echo $site->url; ?>" target="_blank" class="url"><?php echo shorturl($site->url); ?></a>
@@ -222,10 +214,8 @@
 
 <?php endif;  ?>	
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
-</body>
-</html>
+<?php include __DIR__.'/footer.php'; ?>
 
 
 
