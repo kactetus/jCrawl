@@ -50,6 +50,11 @@ class Reaver extends DOMDocument
 		echo '['.Carbon::now().'] Shutting Reaver Down...'. PHP_EOL;
 	}
 
+	public function setUrl($url)
+	{
+		$this->url = $url;
+	}
+
 	public function init()
 	{
 		$this->ch = curl_init();

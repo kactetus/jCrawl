@@ -92,11 +92,10 @@
 
 	.form-control {
 		width: 100%;
-		height: 25px;
+		height: 15px;
 		display: inline-block;
-		margin-top: 10px;
-		padding: 0 15px;
-		border: none;
+		padding: 5px 15px;
+		border: 1px solid rgb(230, 230, 230);
 		font-size: 1.1em;
 	}
 
@@ -118,6 +117,25 @@
 		margin-bottom: 5px;
 		font-size: 0.9em;
 	}
+	button {
+		background: rgb(247, 247, 247);
+		border: none;
+		padding: 10px 25px;
+		margin: 10px 0;
+	}
+	button:hover {
+		cursor: pointer;
+	}
+
+	.alert {
+		margin: 20px 0;
+		background: green;
+		padding: 25px;
+		color: #fff;
+	}
+	.alert > strong {
+		color: #fff;
+	}
 </style>
 
 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -134,19 +152,17 @@
 		</div>
 		<div class="search">
 			<form action="index.php" method="get">
-				<input type="text" name="q" class="form-control" value="<?php if(isset($_GET['q'])) echo $_GET['q']; ?>">
+				<input style="margin-top: 9px" type="text" name="q" class="form-control" value="<?php if(isset($_GET['q'])) echo $_GET['q']; ?>">
 			</form>
 		</div>
 		<ul class="menu">
-			<li><a href="">Admin</a></li>
-			<li><a href="">Register</a></li>
-			<li><a href="">Login</a></li>
+			<li><a href="/?p=admin">Admin</a></li>
 		</ul>
 	</div>
 </nav>
 
 <div class="container">
-<?php if(isset($_GET['q'])): ?>
+<?php if(isset($_GET['q']) && !isset($_GET['p'])): ?>
 
 	<?php 
 	$query = '%'.$_GET['q'].'%';
@@ -157,11 +173,11 @@
 	?>
 	
 	<div class="result-info">
-		<h1> Searching <?php echo $_GET['q']; ?></h1>
+		<h1> Searching for "<?php echo $_GET['q']; ?>"</h1>
 		About <?php echo $sites->count(); ?> results...
 	</div>
 
-	<?php foreach($sites as $site): ?>
+	<?php foreach($sites as $site): htmlspecialchars($site->title); htmlspecialchars($site->description);?>
 		<div class="result">
 			<a href="<?php echo $site->url; ?>" target="_blank" class="title"><?php echo truncate(highlight($site->title, $query), 50); ?></a>
 			<a href="<?php echo $site->url; ?>" target="_blank" class="url"><?php echo shorturl($site->url); ?></a>
@@ -172,6 +188,34 @@
 
 <?php endif; ?>
 </div>
+
+<?php if(isset($_GET['p']) && $_GET['p'] == 'admin'): ?>
+
+	<div class="container">
+		<?php if(isset($_GET['site']) && $_GET['site'] == 'added'): ?>
+			<div class="alert alert-success">
+				<strong>Success!</strong> Your site has been added and is currently being crawled.
+			</div>
+		<?php endif; ?>
+		<div class="add-sites" style="width: 30%; display: inline-block; float: left; clear: left; position: relative;">
+			<h1>Add Websites</h1>
+			<form action="/add-site.php" method="post">
+				<input type="text" class="form-control"  name="site" style="width: 100% !important;">
+				<button type="submit">Add Website</button>
+			</form>
+			<hr>
+			<form action="/add-site.php?indexAll=true" method="post">
+				<button type="submit">Follow Links</button>
+			</form>
+			<hr>
+			<form action="/add-site.php?drop-db=true" method="post">
+				<button type="submit">Clear Database</button>
+			</form>
+		</div>
+		
+	</div>
+
+<?php endif;  ?>	
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
