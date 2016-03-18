@@ -2,6 +2,7 @@
 
 use \DOMDocument;
 use Carbon\Carbon;
+use Crawler\Sites;
 
 class Reaver extends DOMDocument
 {
@@ -117,15 +118,19 @@ class Reaver extends DOMDocument
 
 	public function index()
 	{
-		echo '['.Carbon::now().'] (200) >> '. $this->url .PHP_EOL;
-		$indexed = [
-			'url' => $this->url,
-			'title' => $this->title, 
-			'description' => $this->description,
-			'site' => preg_replace('/(\s)+/', ' ', strip_tags($this->html))
-		];
+		
+		$site = Sites::where('url', $this->url)->first();
+		if(is_null($site)) $site = new Sites;
 
-		$this->indexed[] = json($indexed);
+		$site->url = $this->url;
+		$site->title = $this->title;
+		$site->description = $this->description;
+		$site->html = preg_replace('/(\s)+/', ' ', strip_tags($this->html));
+		$site->expires = Carbon::now()->addWeeks(2);
+
+		$site->save();
+
+		echo '['.Carbon::now().'] (200) >> '. $this->url .PHP_EOL;
 	}
 
 	
