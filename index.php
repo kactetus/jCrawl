@@ -36,6 +36,11 @@
 		color: #08c;
 	}
 
+	strong {
+		font-weight: bold;
+		color: #000;
+	}
+
 	.nav-container {
 		width: 960px;
 		margin: 0 auto;
@@ -100,12 +105,13 @@
 	}
 
 	.result {
-		width: 70%;
+		width: 60%;
 		margin-bottom: 25px;
 	}
 	.title {
 		color: #000;
 		display: block;
+		font-size: 1.1em;
 	}
 	.url {
 		display: block;
@@ -153,9 +159,9 @@
 
 	<?php foreach($sites as $site): ?>
 		<div class="result">
-			<a href="" class="title"><?php echo $site->title; ?></a>
-			<a href="" class="url"><?php echo $site->url; ?></a>
-			<p class="description"><?php echo $site->description; ?></p>
+			<a href="" class="title"><?php echo truncate($site->title, 50); ?></a>
+			<a href="" class="url"><?php echo shorturl($site->url); ?></a>
+			<p class="description"><?php echo highlight($site->description, $query); ?></p>
 		</div>
 	<?php endforeach; ?>
 
