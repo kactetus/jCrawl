@@ -118,17 +118,6 @@ class Reaver extends DOMDocument
 		$this->title = $title;
 		$this->description = $description;
 		$this->index();
-
-
-	public function fetch()
-	{
-		$dom = fetch($this->links[0]);
-		$this->scrape($dom['html'], $this->links[0]);
-		echo '['.Carbon::now().'] Found seed url >> '. $this->links[0] . PHP_EOL;
-		echo '['.Carbon::now().'] Starting crawl... '.PHP_EOL;
-
-		$this->followed[] = $this->links[0];
-
 	}
 
 	public function index()

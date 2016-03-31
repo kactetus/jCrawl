@@ -11,7 +11,7 @@ $capsule = new Capsule;
 
 $capsule->addConnection([
     'driver'    => 'mysql',
-    'host'      => '127.0.0.1',
+    'host'      => 'localhost',
     'database'  => 'reaver_db',
     'username'  => 'homestead',
     'password'  => 'secret',
